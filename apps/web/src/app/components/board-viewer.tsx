@@ -44,8 +44,7 @@ export const BoardViewer: FC<BoardViewerProps> = ({}) => {
                 return <PlayerPiece key={player.name} player={player} />;
               }
             })}
-            {/* {outerSquares.indexOf(square) + 1 || null} */}
-            {square}
+            {outerSquares.indexOf(square) + 1 || null}
             {square !== 7 && boardRoles[square - 1] && (
               <div>{boardRoles[square - 1].name}</div>
             )}
