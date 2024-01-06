@@ -1,67 +1,56 @@
-"use client";
+import {
+  BoardViewer,
+  ControllerViewer,
+  MessageViewer,
+  PlayerViewer,
+  RoleViewer,
+  TrumpViewer,
+} from "./components";
+import React from "react";
 
-import { Button } from "@repo/ui/button";
-import { useEffect, useState } from "react";
-
-const API_HOST = process.env.NEXT_PUBLIC_API_HOST || "http://localhost:3001";
-
-export default function Web() {
-  const [name, setName] = useState<string>("");
-  const [response, setResponse] = useState<{ message: string } | null>(null);
-  const [error, setError] = useState<string | undefined>();
-
-  useEffect(() => {
-    setResponse(null);
-    setError(undefined);
-  }, [name]);
-
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setName(e.target.value);
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    try {
-      const result = await fetch(`${API_HOST}/message/${name}`);
-      const response = await result.json();
-      setResponse(response);
-    } catch (err) {
-      console.error(err);
-      setError("Unable to fetch response");
-    }
-  };
-
-  const onReset = () => {
-    setName("");
-  };
-
+export default function Page(): JSX.Element {
   return (
-    <div>
-      <h1>Web</h1>
-      <form onSubmit={onSubmit}>
-        <label htmlFor="name">Name </label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={name}
-          onChange={onChange}
-        ></input>
-        <Button type="submit">Submit</Button>
-      </form>
-      {error && (
+    <main className="flex flex-col items-center min-h-screen p-24">
+      <MessageViewer />
+      <div className="flex gap-3">
         <div>
-          <h3>Error</h3>
-          <p>{error}</p>
+          <TrumpViewer />
+          <ControllerViewer />
         </div>
-      )}
-      {response && (
-        <div>
-          <h3>Greeting</h3>
-          <p>{response.message}</p>
-          <Button onClick={onReset}>Reset</Button>
+        <div className="flex gap-3">
+          <PlayerViewer />
+          <RoleViewer />
         </div>
-      )}
-    </div>
+      </div>
+      <BoardViewer />
+    </main>
   );
 }
+
+/**
+ * 操作者はひとり
+ *
+ * 役職入力フェーズ
+ *  役職を入力すると、入力欄の下にその役職カード一覧が表示される
+ *  役職のプライオリティを決める
+ * プレイヤー入力フェーズ
+ *  プレイヤーの名前を全員分入力
+ *  プレイヤーの名前を入力すると、入力欄の下にそのプレイヤーカード一覧が表示される
+ *  全員分入力したら、スタートボタンを押す
+ * トランプを選択するフェーズ
+ *  上から順に、トランプを選択する
+ *  トランプを選択すると、そのトランプが選択されたことを示すプレイヤー名のマークがつく
+ *  トランプを選択したら、次のプレイヤーに移る
+ *  全員分選択したら、オープンボタンを押す
+ * 並び替えフェーズ
+ *  トランプがオープンされる
+ *  数字が大きい順にプレイヤー一覧を並び替える
+ * すごろく開始フェーズ
+ *  すごろくを開始するボタンを押す
+ *  すごろくボードが表示される
+ *
+ *  順番にカードをめくる。カードは開いたまま。残りのカードから引く
+ *
+ * 順番の管理をどうするか。
+ *
+ */
