@@ -2,27 +2,27 @@
 import React, { FC } from "react";
 import { useBoundStore, skipRole } from "../store";
 import { GameStateEnum } from "../types";
+import { Button } from "@repo/ui/button";
+import { Flex } from "@repo/ui";
 
 interface ControllerViewerProps {}
 export const ControllerViewer: FC<ControllerViewerProps> = ({}) => {
   const { gameState, isRoundComp, isLastPlayer, currentPlayer } =
     useBoundStore();
   return (
-    <div className="flex gap-3">
-      <p>isRoundComp: {String(isRoundComp)}</p>
-      <p>isLastPlayer: {String(isLastPlayer)}</p>
+    <Flex gap="3">
       {gameState === GameStateEnum.inputPhase && (
         <div>
           <StartGameButton />
         </div>
       )}
       {gameState === GameStateEnum.orderPhase && (
-        <div className="flex gap-3">
+        <Flex gap="3">
           {isRoundComp ? <StartSugorokuButton /> : <NextButtonOnOrder />}
-        </div>
+        </Flex>
       )}
       {gameState === GameStateEnum.sugorokuPhase && (
-        <div className="flex gap-3">
+        <Flex gap="3">
           {isRoundComp ? (
             <NextRoundButton />
           ) : (
@@ -31,33 +31,33 @@ export const ControllerViewer: FC<ControllerViewerProps> = ({}) => {
               {!currentPlayer.usedSkip && <SkipButton />}
             </>
           )}
-        </div>
+        </Flex>
       )}
       {gameState === GameStateEnum.gameCompletionPhase && (
         <div>
           <NextButtonOnPlay />
         </div>
       )}
-    </div>
+    </Flex>
   );
 };
 
 const StartGameButton = () => {
   const { setGameState } = useBoundStore();
   return (
-    <button
+    <Button
       onClick={() => {
         setGameState(GameStateEnum.orderPhase);
       }}
     >
       ゲームスタート!
-    </button>
+    </Button>
   );
 };
 const StartSugorokuButton = () => {
   const { setGameState, nextPlayer, sortPlayers, allClose } = useBoundStore();
   return (
-    <button
+    <Button
       onClick={async () => {
         console.log("sortPlayers");
         allClose();
@@ -67,7 +67,7 @@ const StartSugorokuButton = () => {
       }}
     >
       すごろくスタート!
-    </button>
+    </Button>
   );
 };
 
@@ -82,7 +82,7 @@ const NextButtonOnOrder = () => {
     flipTrump,
   } = useBoundStore();
   return (
-    <button
+    <Button
       onClick={() => {
         if (!selectedTrump)
           return alert("お好きなトランプを選択してください！");
@@ -98,7 +98,7 @@ const NextButtonOnOrder = () => {
       }}
     >
       決定
-    </button>
+    </Button>
   );
 };
 
@@ -116,7 +116,7 @@ const NextButtonOnPlay = () => {
     getNewRole,
   } = useBoundStore();
   return (
-    <button
+    <Button
       onClick={() => {
         if (!selectedTrump)
           return alert("お好きなトランプを選択してください！");
@@ -138,7 +138,7 @@ const NextButtonOnPlay = () => {
       disabled={selectedTrump ? false : true}
     >
       カード確定
-    </button>
+    </Button>
   );
 };
 
@@ -153,7 +153,7 @@ const SkipButton = () => {
     roles,
   } = useBoundStore();
   return (
-    <button
+    <Button
       onClick={() => {
         const newPlayer = useSkip(currentPlayer);
         assignRole(newPlayer, skipRole);
@@ -165,7 +165,7 @@ const SkipButton = () => {
       }}
     >
       スキップ
-    </button>
+    </Button>
   );
 };
 
@@ -173,7 +173,7 @@ const NextRoundButton = () => {
   const { roles, nextPlayer, allClose, checkPlayersAndFixRole, setGameState } =
     useBoundStore();
   return (
-    <button
+    <Button
       onClick={() => {
         const finish = checkPlayersAndFixRole();
         console.log("roles", roles);
@@ -186,6 +186,6 @@ const NextRoundButton = () => {
       }}
     >
       次のラウンドへ
-    </button>
+    </Button>
   );
 };

@@ -5,6 +5,7 @@ import { useBoundStore } from "../store";
 
 import clsx from "clsx";
 import { calculateOuterNumbers } from "./utils";
+import { Box, Flex, Grid, Text } from "@repo/ui";
 
 interface BoardViewerProps {}
 
@@ -26,31 +27,58 @@ export const BoardViewer: FC<BoardViewerProps> = ({}) => {
   }, []);
 
   return (
-    <div className={`grid ${getGridCol(boardSize)} gap-2`}>
+    <Grid columns={String(boardSize)} rows={String(boardSize)} gap="3">
       {(gameState === GameStateEnum.sugorokuPhase ||
         gameState === GameStateEnum.gameCompletionPhase) &&
         squares.map((square) => (
-          <div
+          <Box
             key={square}
-            className={`rounded-lg flex gap-x-12 gap-y-3 flex-wrap items-center justify-center ${
-              square === centerSquare
-                ? `${getSpanStart(boardSize)}`
-                : "w-48 h-24 border border-gray-500"
+            className={`relative rounded-lg ${
+              square !== centerSquare &&
+              "w-full  max-h-20 border-2 border-gray-300 "
             }`}
+            style={{
+              gridColumn:
+                square === centerSquare ? `span ${boardSize - 2}` : "span 1",
+              gridRow:
+                square === centerSquare ? `span ${boardSize - 2}` : "span 1",
+              // background: square !== centerSquare ? "linear-gradient(to bottom right, #F0F0F0, var(--indigo-a3))" : undefined,
+            }}
           >
-            {players.map((player) => {
-              const playerSquare = outerSquares[player.position];
-              if (playerSquare === square) {
-                return <PlayerPiece key={player.name} player={player} />;
-              }
-            })}
-            {outerSquares.indexOf(square) + 1 || null}
-            {square !== 7 && boardRoles[square - 1] && (
-              <div>{boardRoles[square - 1].name}</div>
-            )}
-          </div>
+            <Flex align="start" justify="center" height="100%">
+              <Flex
+                gap="3"
+                justify="center"
+                className="h-full absolute top-0 left-0 z-30"
+                wrap="wrap"
+              >
+                {players.map((player) => {
+                  const playerSquare = outerSquares[player.position];
+                  if (playerSquare === square) {
+                    return <PlayerPiece key={player.name} player={player} />;
+                  }
+                })}
+              </Flex>
+              <Flex className="h-full w-full pl-3" align="center" gap="2">
+                <Box className="">
+                  <Text size="1">
+                    {square !== centerSquare
+                      ? `${outerSquares.indexOf(square) + 1}:`
+                      : null}
+                  </Text>
+                </Box>
+                <Box className="w-full">
+                  <Text size="1">
+                    {square !== 7 && boardRoles[square - 1] && (
+                      <div>{boardRoles[square - 1].name}</div>
+                    )}
+                  </Text>
+                </Box>
+              </Flex>
+            </Flex>
+          </Box>
         ))}
-    </div>
+    </Grid>
   );
 };
 
@@ -60,50 +88,26 @@ interface PlayerPieceProps {
 
 const PlayerPiece: FC<PlayerPieceProps> = (props) => {
   const { player } = props;
-  const getColorClass = (color: string) => {
-    switch (color) {
-      case "red":
-        return "bg-red-500";
-      case "green":
-        return "bg-green-500";
-      case "blue":
-        return "bg-blue-500";
-      case "orange":
-        return "bg-orange-500";
-    }
-  };
 
   const playerPieceClasses = clsx(
-    "w-8 h-8",
+    "w-7 h-7",
     "flex items-center justify-center",
-    " rounded-full",
+    "text-xs rounded-full",
     getColorClass(player.color),
   );
 
-  return <div className={playerPieceClasses}>{player.name.slice(0, 2)}</div>;
+  return <Box className={playerPieceClasses}>{player.name.slice(0, 3)}</Box>;
 };
 
-const getGridCol = (size: number) => {
-  switch (size) {
-    case 4:
-      return "grid-cols-4";
-    case 5:
-      return "grid-cols-5";
-    case 6:
-      return "grid-cols-6";
-    case 7:
-      return "grid-cols-7";
-  }
-};
-const getSpanStart = (size: number) => {
-  switch (size) {
-    case 4:
-      return "col-span-2 row-span-2";
-    case 5:
-      return "col-span-3 row-span-3";
-    case 6:
-      return "col-span-4 row-span-4";
-    case 7:
-      return "col-span-5 row-span-5";
+export const getColorClass = (color: string) => {
+  switch (color) {
+    case "red":
+      return "bg-red-400";
+    case "green":
+      return "bg-green-400";
+    case "blue":
+      return "bg-blue-400";
+    case "orange":
+      return "bg-orange-400";
   }
 };

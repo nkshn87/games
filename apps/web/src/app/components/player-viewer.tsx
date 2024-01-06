@@ -2,15 +2,17 @@
 import React, { FC } from "react";
 import { useBoundStore } from "../store";
 import { Player } from "../types";
+import { Box, Card, Flex, Table, Text } from "@repo/ui";
+import { getColorClass } from ".";
 
 interface PlayerViewerProps {}
 
 export const PlayerViewer: FC<PlayerViewerProps> = ({}) => {
   const { players } = useBoundStore();
   return (
-    <div className="p-3">
+    <Box width="100%">
       <PlayerList playerPropsList={players} />
-    </div>
+    </Box>
   );
 };
 
@@ -21,11 +23,29 @@ interface PlayerListProps {
 const PlayerList: FC<PlayerListProps> = (props) => {
   const { playerPropsList } = props;
   return (
-    <div className="gap-3">
-      {playerPropsList.map((playerProps) => (
-        <Player key={playerProps.name} {...playerProps} />
-      ))}
-    </div>
+    <Table.Root style={{ width: "100%" }}>
+      <Table.Header>
+        <Table.Row>
+          <Table.ColumnHeaderCell>
+            <Text></Text>
+          </Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>
+            <Text>名前</Text>
+          </Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>
+            <Text>役職</Text>
+          </Table.ColumnHeaderCell>
+          <Table.ColumnHeaderCell>
+            <Text>確定</Text>
+          </Table.ColumnHeaderCell>
+        </Table.Row>
+      </Table.Header>
+      <Table.Body>
+        {playerPropsList.map((playerProps) => (
+          <Player key={playerProps.name} {...playerProps} />
+        ))}
+      </Table.Body>
+    </Table.Root>
   );
 };
 
@@ -33,15 +53,21 @@ const PlayerList: FC<PlayerListProps> = (props) => {
 type PlayerProps = Pick<Player, "name"> & Partial<Omit<Player, "name">>;
 
 const Player: FC<PlayerProps> = (props) => {
-  const { name, role, fixed, selectedTrumpValue } = props;
+  const { name, role, fixed, color } = props;
   return (
-    <>
-      <div className="flex gap-2 p-2 rounded-xl ">
-        <div>{selectedTrumpValue}</div>
-        <div>{name}</div>
-        <div>{role?.name}</div>
-        {fixed && <div>確</div>}
-      </div>
-    </>
+    <Table.Row>
+      <Table.Cell>
+        <Box
+          className={`${color && getColorClass(color)} w-7 h-7 rounded-full`}
+        />
+      </Table.Cell>
+      <Table.RowHeaderCell>
+        <Text>{name}</Text>
+      </Table.RowHeaderCell>
+      <Table.Cell>
+        <Text>{role?.name}</Text>
+      </Table.Cell>
+      <Table.Cell>{fixed && <Text>確</Text>}</Table.Cell>
+    </Table.Row>
   );
 };

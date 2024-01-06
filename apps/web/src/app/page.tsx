@@ -3,27 +3,39 @@ import {
   ControllerViewer,
   MessageViewer,
   PlayerViewer,
-  RoleViewer,
   TrumpViewer,
 } from "./components";
 import React from "react";
+import { Box, Flex, Grid, Theme } from "@repo/ui";
 
 export default function Page(): JSX.Element {
   return (
-    <main className="flex flex-col items-center min-h-screen p-24">
-      <MessageViewer />
-      <div className="flex gap-3">
-        <div>
-          <TrumpViewer />
-          <ControllerViewer />
-        </div>
-        <div className="flex gap-3">
-          <PlayerViewer />
-          {/* <RoleViewer /> */}
-        </div>
-      </div>
-      <BoardViewer />
-    </main>
+    <Theme>
+      <Flex justify="center">
+        <Grid
+          rows="3"
+          p="7"
+          gap="3"
+          style={{ gridTemplateRows: "12fr 2fr 6fr" }}
+          className="h-screen w-full max-w-6xl"
+        >
+          <BoardViewer />
+          <MessageViewer />
+          <Box>
+            <Grid
+              columns="2"
+              style={{ gridTemplateColumns: "5fr 2fr", height: "100%" }}
+            >
+              <Grid rows="2" gap="3" style={{ gridTemplateRows: "auto 2fr" }}>
+                <TrumpViewer />
+                <ControllerViewer />
+              </Grid>
+              <PlayerViewer />
+            </Grid>
+          </Box>
+        </Grid>
+      </Flex>
+    </Theme>
   );
 }
 

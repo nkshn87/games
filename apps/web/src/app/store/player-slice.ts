@@ -35,7 +35,7 @@ const DEFAULT_PLAYERS: Player[] = [
     selectedTrumpValue: 1,
     role: null,
     fixed: false,
-    position: 15,
+    position: 0,
     color: "orange",
     usedSkip: false,
   },
@@ -173,11 +173,16 @@ export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
       if (currentPlayer.name !== player.name) {
         return state;
       }
+      let isRoundComp = false;
+      if (get().isLastPlayer) {
+        isRoundComp = true;
+      }
       return {
         ...state,
         players: state.players.map((p) =>
           p.name === player.name ? { ...player, selectedTrumpValue } : p,
         ),
+        isRoundComp,
       };
     }),
   useSkip: (player) => {
