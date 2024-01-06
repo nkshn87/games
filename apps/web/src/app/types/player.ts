@@ -13,4 +13,6 @@ export type Player = {
   selectedTrumpValue: number | null;
   // カラー
   color: string;
+  // スキップを使ったか
+  usedSkip: boolean;
 };

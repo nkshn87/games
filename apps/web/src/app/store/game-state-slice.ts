@@ -9,7 +9,7 @@ export const createGameStateSlice: StateCreator<
   GameStateSlice
 > = (set, get) => ({
   // ゲームの状態
-  gameState: GameStateEnum.inputPhase,
+  gameState: GameStateEnum.sugorokuPhase,
   // ゲームの状態を変更する
   setGameState: (gameState) =>
     set((state) => {

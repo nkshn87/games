@@ -1,11 +1,12 @@
 "use client";
 import React, { FC } from "react";
-import { useBoundStore } from "../store";
+import { useBoundStore, skipRole } from "../store";
 import { GameStateEnum } from "../types";
 
 interface ControllerViewerProps {}
 export const ControllerViewer: FC<ControllerViewerProps> = ({}) => {
-  const { gameState, isRoundComp, isLastPlayer } = useBoundStore();
+  const { gameState, isRoundComp, isLastPlayer, currentPlayer } =
+    useBoundStore();
   return (
     <div className="flex gap-3">
       <p>isRoundComp: {String(isRoundComp)}</p>
@@ -27,7 +28,7 @@ export const ControllerViewer: FC<ControllerViewerProps> = ({}) => {
           ) : (
             <>
               <NextButtonOnPlay />
-              <SkipButton />
+              {!currentPlayer.usedSkip && <SkipButton />}
             </>
           )}
         </div>
@@ -111,6 +112,8 @@ const NextButtonOnPlay = () => {
     nextPlayer,
     clearSelectedTrump,
     flipTrump,
+    assignRole,
+    getNewRole,
   } = useBoundStore();
   return (
     <button
@@ -122,9 +125,12 @@ const NextButtonOnPlay = () => {
         // プレイヤーにトランプの数字をセット（セットする意味は特にないが、ユーザアクションの確定を意味する）
         setSelectedTrump(currentPlayer, selectedTrump?.value);
         // トランプの数字分進める
-        movePlayer(currentPlayer, selectedTrump.value);
+        const newPlayer = movePlayer(currentPlayer, selectedTrump.value);
+        // 進めた先のマスの役割をセットする（確定はしていない）
+        const newRole = getNewRole(newPlayer);
+        assignRole(newPlayer, newRole);
         if (!isLastPlayer) {
-          // 最後のプレーヤーじゃないなら次のプレーヤーへ
+          // 最後のプレーヤーのときは、結果を眺められるよう、次のプレーヤーには移動しない
           nextPlayer();
         }
         clearSelectedTrump();
@@ -137,11 +143,25 @@ const NextButtonOnPlay = () => {
 };
 
 const SkipButton = () => {
-  const { nextPlayer } = useBoundStore();
+  const {
+    nextPlayer,
+    useSkip,
+    isLastPlayer,
+    clearSelectedTrump,
+    assignRole,
+    currentPlayer,
+    roles,
+  } = useBoundStore();
   return (
     <button
       onClick={() => {
-        nextPlayer();
+        const newPlayer = useSkip(currentPlayer);
+        assignRole(newPlayer, skipRole);
+        if (!isLastPlayer) {
+          // 最後のプレーヤーのときは、結果を眺められるよう、次のプレーヤーには移動しない
+          nextPlayer();
+        }
+        clearSelectedTrump();
       }}
     >
       スキップ
@@ -150,10 +170,17 @@ const SkipButton = () => {
 };
 
 const NextRoundButton = () => {
-  const { nextPlayer, allClose, enableTrumps } = useBoundStore();
+  const { roles, nextPlayer, allClose, checkPlayersAndFixRole, setGameState } =
+    useBoundStore();
   return (
     <button
       onClick={() => {
+        const finish = checkPlayersAndFixRole();
+        console.log("roles", roles);
+        if (finish) {
+          setGameState(GameStateEnum.gameCompletionPhase);
+          return;
+        }
         nextPlayer();
         allClose();
       }}

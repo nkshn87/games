@@ -8,7 +8,7 @@ interface PlayerViewerProps {}
 export const PlayerViewer: FC<PlayerViewerProps> = ({}) => {
   const { players } = useBoundStore();
   return (
-    <div className="w-40 p-3">
+    <div className="p-3">
       <PlayerList playerPropsList={players} />
     </div>
   );

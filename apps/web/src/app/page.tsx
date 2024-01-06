@@ -19,7 +19,7 @@ export default function Page(): JSX.Element {
         </div>
         <div className="flex gap-3">
           <PlayerViewer />
-          <RoleViewer />
+          {/* <RoleViewer /> */}
         </div>
       </div>
       <BoardViewer />

@@ -14,14 +14,16 @@ export interface PlayersSlice {
   // 並び替え
   sortPlayers: () => void;
   // 役職を確定する
-  fixPlayerRole: (player: Player, role: Role) => void;
+  checkPlayersAndFixRole: () => boolean;
   // プレイヤーの場所を移動する
-  movePlayer: (player: Player, position: Player["position"]) => void;
+  movePlayer: (player: Player, position: Player["position"]) => Player;
   // 選択されたトランプを設定する
   setSelectedTrump: (
     player: Player,
     selectedTrumpValue: Player["selectedTrumpValue"],
   ) => void;
+  // スキップを使った
+  useSkip: (player: Player) => Player;
 }
 
 export interface RolesSlice {
@@ -37,6 +39,11 @@ export interface RolesSlice {
   fixRole: (role: Role) => void;
   // シャッフルする
   shuffleBoardRoles: () => void;
+  // プレイヤーの新しい役職を取得する（すごろくで移動した直後に実行する想定）
+  getNewRole: (currentPlayer: Player) => Role;
+  // 確定していない役職を取得する
+  getUnFixedRoles: () => Role[];
+  replaceFixedRoles: () => Role[];
 }
 
 export interface TrumpsSlice {
@@ -66,6 +73,13 @@ export interface GameStateSlice {
   gameState: GameStateEnumKeys;
   // ゲームの状態を変更する
   setGameState: (state: GameStateEnumKeys) => void;
+}
+
+export interface RolePlayerSlice {
+  // 役職を持っているプレイヤー
+  rolePlayer: Player | null;
+  // 役職を持っているプレイヤーを設定する
+  setRolePlayer: (player: Player) => void;
 }
 
 export type State = PlayersSlice & RolesSlice & TrumpsSlice & GameStateSlice;

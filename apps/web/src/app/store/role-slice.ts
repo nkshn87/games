@@ -10,7 +10,7 @@ const DEFAULT_ROLES: Role[] = [
   { name: "2番目", fixed: false },
 ];
 
-const OPTION_ROLES: Role[] = [{ name: "スキップ", fixed: false }];
+export const skipRole: Role = { name: "スキップ", fixed: false };
 const BOARD_SIZE = 5;
 const INNER_SIZE = BOARD_SIZE - 2;
 const INNER_SQUARES = INNER_SIZE * INNER_SIZE;
@@ -21,18 +21,18 @@ const SQUARES = Array.from(
 const i = SQUARES.length / DEFAULT_ROLES.length;
 // DEFAULT_ROLESをi回繰り返す
 const BOARD_ROLES = Array.from({ length: i }, (_, i) => DEFAULT_ROLES).flat();
-// BOARD_ROLESを削ってでも最低２つOPTION_ROLESを入れる
+// BOARD_ROLESを削ってでも3つskipRoleを入れる
 
-// 余った分をOPTION_ROLESで埋める
+// 余った分をskipRoleで埋める
 let OPTION_ROLES_LENGTH = SQUARES.length - BOARD_ROLES.length;
-if (OPTION_ROLES_LENGTH < 2) {
-  const diff = 2 - OPTION_ROLES_LENGTH;
+if (OPTION_ROLES_LENGTH < 3) {
+  const diff = 3 - OPTION_ROLES_LENGTH;
   OPTION_ROLES_LENGTH += diff;
   BOARD_ROLES.splice(BOARD_ROLES.length - diff, diff);
 }
 const OPTION_ROLES_LIST = Array.from(
   { length: OPTION_ROLES_LENGTH },
-  (_, i) => OPTION_ROLES,
+  (_, i) => skipRole,
 ).flat();
 const BOARD_ROLES_LIST = BOARD_ROLES.concat(OPTION_ROLES_LIST);
 
@@ -65,4 +65,39 @@ export const createRolesSlice: StateCreator<State, [], [], RolesSlice> = (
       const shuffledRoles = state.boardRoles.sort(() => Math.random() - 0.5);
       return { ...state, boardRoles: shuffledRoles };
     }),
+  getNewRole: (currentPlayer) => {
+    const outerSquares = calculateOuterNumbers(get().boardSize);
+    // TODO: ややこしすぎる。gridレイアウトに合わせてバックエンド実装したのアホすぎる
+    const newRole = get().boardRoles[outerSquares[currentPlayer.position] - 1];
+    return newRole;
+  },
+  getUnFixedRoles: () => {
+    const roles = get().roles;
+    return roles.filter((r) => !r.fixed);
+  },
+  replaceFixedRoles: () => {
+    const unFixedRoles = get().getUnFixedRoles();
+    const randomRole = getRandom(unFixedRoles);
+    if (!randomRole) {
+      return get().boardRoles;
+    }
+    const boardRoles = get().boardRoles.map((role) =>
+      role.fixed ? randomRole : role,
+    );
+    set((state) => {
+      return { ...state, boardRoles };
+    });
+    return boardRoles;
+  },
 });
+
+function getRandom(undecidedRoles: Role[]) {
+  // フィルタリングされた配列が空でない場合、ランダムな要素を返す
+  if (undecidedRoles.length > 0) {
+    const randomIndex = Math.floor(Math.random() * undecidedRoles.length);
+    return undecidedRoles[randomIndex];
+  }
+
+  // undecidedRolesが空の場合、nullまたは適切な値を返す
+  return null;
+}
