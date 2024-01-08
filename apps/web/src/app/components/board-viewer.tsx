@@ -54,7 +54,7 @@ export const BoardViewer: FC<BoardViewerProps> = () => {
               <Box className="h-full w-full">
                 <Flex
                   justify="center"
-                  className="h-full absolute top-0 left-0 z-30 gap-2 sm:gap-3"
+                  className="h-full absolute top-0 left-0 z-30 gap-2 sm:gap-3 p-1"
                   wrap="wrap"
                 >
                   {players.map((player) => {
@@ -90,7 +90,7 @@ export const BoardViewer: FC<BoardViewerProps> = () => {
                           gap="3"
                           className="w-full h-full px-4 md:px-20"
                         >
-                          <Text>🐳 役職確定条件</Text>
+                          <Text size='6'>🐳 役職確定条件</Text>
                           <Text>
                             一巡した時に他の人と役職が被っていないこと
                           </Text>
@@ -113,7 +113,7 @@ export const BoardViewer: FC<BoardViewerProps> = () => {
                 width={35}
                 height={50}
               />
-              <Text className="text-5xl">トランプ すごろく ゲーム 🎲</Text>
+              <Text size='9'>トランプ すごろく ゲーム 🎲</Text>
             </Flex>
           </Box>
         </Flex>
