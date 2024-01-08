@@ -3,42 +3,42 @@ import { PlayersSlice, State } from "./slice-interfaces";
 import { Player } from "../types";
 
 const DEFAULT_PLAYERS: Player[] = [
-  {
-    name: "isao",
-    selectedTrumpValue: 1,
-    role: null,
-    fixed: false,
-    position: 0,
-    color: "red",
-    usedSkip: false,
-  },
-  {
-    name: "hiroki",
-    selectedTrumpValue: 1,
-    role: null,
-    fixed: false,
-    position: 0,
-    color: "blue",
-    usedSkip: false,
-  },
-  {
-    name: "shuhei",
-    selectedTrumpValue: 1,
-    role: null,
-    fixed: false,
-    position: 0,
-    color: "green",
-    usedSkip: false,
-  },
-  {
-    name: "shun",
-    selectedTrumpValue: 1,
-    role: null,
-    fixed: false,
-    position: 0,
-    color: "orange",
-    usedSkip: false,
-  },
+  // {
+  //   name: "isao",
+  //   selectedTrumpValue: null,
+  //   role: null,
+  //   fixed: false,
+  //   position: 0,
+  //   color: "red",
+  //   usedSkip: false,
+  // },
+  // {
+  //   name: "hiroki",
+  //   selectedTrumpValue: null,
+  //   role: null,
+  //   fixed: false,
+  //   position: 0,
+  //   color: "blue",
+  //   usedSkip: false,
+  // },
+  // {
+  //   name: "shuhei",
+  //   selectedTrumpValue: null,
+  //   role: null,
+  //   fixed: false,
+  //   position: 0,
+  //   color: "green",
+  //   usedSkip: false,
+  // },
+  // {
+  //   name: "shun",
+  //   selectedTrumpValue: null,
+  //   role: null,
+  //   fixed: false,
+  //   position: 0,
+  //   color: "orange",
+  //   usedSkip: false,
+  // },
 ];
 
 export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
@@ -46,28 +46,39 @@ export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
   get,
 ) => ({
   players: DEFAULT_PLAYERS,
-  currentPlayer: DEFAULT_PLAYERS[0],
+  currentPlayer: null,
   isRoundComp: false,
   isLastPlayer: false,
+  colors: ["red", "blue", "green", "orange", "purple", "pink"].sort(
+    () => Math.random() - 0.5,
+  ),
+  setCurrentPlayer: (player) => {
+    set((state) => ({
+      ...state,
+      currentPlayer: player,
+    }));
+  },
   nextPlayer: () => {
+    let nextPlayer = null;
     let isLastPlayer = false;
     const players = get().players.filter((p) => !p.fixed);
     const currentPlayer = get().currentPlayer;
     set((state) => {
       if (players.length === 1) {
+        nextPlayer = players[0];
         return {
           ...state,
-          currentPlayer: players[0],
+          currentPlayer: nextPlayer,
           isLastPlayer: true,
           isRoundComp: false,
         };
       }
       if (!currentPlayer || state.isLastPlayer) {
         // もしソート後だった場合、isLastPlayerなのにカレントプレイヤーが最後にいない可能性があるため一律0番目のプレイヤーを返す
-        state.currentPlayer = players[0];
+        nextPlayer = players[0];
         return {
           ...state,
-          currentPlayer: players[0],
+          currentPlayer: nextPlayer,
           isLastPlayer,
           isRoundComp: false,
         };
@@ -77,7 +88,7 @@ export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
       const index = players.findIndex((p) => p.name === currentPlayer.name);
       // 次のプレイヤーのインデックスを計算する
       const nextIndex = (index + 1) % players.length;
-      const nextPlayer = players[nextIndex];
+      nextPlayer = players[nextIndex];
       if (nextIndex === players.length - 1) {
         // 最後のプレイヤーの順番になった。ただし、最後のプレイヤーのターンは終了していない（ラウンドは終わっていない）
         isLastPlayer = true;
@@ -89,6 +100,7 @@ export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
         isRoundComp: false,
       };
     });
+    return nextPlayer;
   },
   sortPlayers: () =>
     new Promise<void>((resolve) => {
@@ -103,10 +115,51 @@ export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
       });
       resolve();
     }),
-  addPlayer: (player) =>
+  addPlayer: (name) =>
     set((state) => {
-      state.players.push(player);
-      return state;
+      const colors = get().colors;
+      const color = colors.pop();
+      if (!color) {
+        return state;
+      }
+      if (name === "") {
+        alert("名前を入力してください");
+        return state;
+      }
+      if (name.length > 10) {
+        alert("名前は10文字以内で入力してください");
+        return state;
+      }
+      const exist = get().players.find((p) => p.name === name);
+      if (exist) {
+        alert("既に同じ名前のプレイヤーがいます");
+        return state;
+      }
+      const player: Player = {
+        name,
+        selectedTrumpValue: null,
+        role: null,
+        fixed: false,
+        position: 0,
+        color: color,
+        usedSkip: false,
+      };
+      return {
+        ...state,
+        players: [...state.players, player],
+        colors: [...colors],
+      };
+    }),
+  removePlayer: (name) =>
+    set((state) => {
+      const rmPlayer = state.players.find((p) => p.name === name);
+      if (!rmPlayer) {
+        alert("プレイヤーが見つかりません");
+        return state;
+      }
+      const newPlayers = state.players.filter((p) => p.name !== name);
+      const colors = [...state.colors, rmPlayer.color];
+      return { ...state, players: newPlayers, colors };
     }),
   assignRole: (player, role) =>
     set((state) => {
@@ -170,7 +223,7 @@ export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
   setSelectedTrump: (player, selectedTrumpValue) =>
     set((state) => {
       const currentPlayer = get().currentPlayer;
-      if (currentPlayer.name !== player.name) {
+      if (currentPlayer?.name !== player.name) {
         return state;
       }
       let isRoundComp = false;
@@ -187,7 +240,7 @@ export const createPlayersSlice: StateCreator<State, [], [], PlayersSlice> = (
     }),
   useSkip: (player) => {
     const currentPlayer = get().currentPlayer;
-    if (currentPlayer.name !== player.name) {
+    if (currentPlayer?.name !== player.name) {
       return player;
     }
     const newPlayer = { ...player, usedSkip: true };

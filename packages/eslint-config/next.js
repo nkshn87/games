@@ -17,7 +17,7 @@ module.exports = {
   env: {
     node: true,
   },
-  plugins: ["only-warn"],
+  plugins: ["only-warn", 'unused-imports'],
   settings: {
     "import/resolver": {
       typescript: {
@@ -36,6 +36,12 @@ module.exports = {
       files: ["*.ts", "*.tsx"],
       rules: {
         "no-undef": "off",
+        "no-unused-vars": "off", // or "@typescript-eslint/no-unused-vars": "off",
+        "unused-imports/no-unused-imports": "error",
+        "unused-imports/no-unused-vars": [
+          "warn",
+          { vars: "all", varsIgnorePattern: "^_", args: "after-used", argsIgnorePattern: "^_" },
+        ],
       },
     },
   ],

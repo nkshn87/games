@@ -1,18 +1,18 @@
-import { Role } from ".";
+import { roleSchema } from "./role";
+import { z } from "zod";
+export const playerSchema = z.object({
+  name: z.string(),
+  role: roleSchema.nullable(),
+  fixed: z.boolean(),
+  position: z.number(),
+  selectedTrumpValue: z.number().nullable(),
+  color: z.string(),
+  usedSkip: z.boolean(),
+});
 
-export type Player = {
-  // なまえ
-  name: string;
-  // 役職
-  role: Role | null;
-  // 役職が確定しているかどうか
-  fixed: boolean;
-  // プレイヤーの場所
-  position: number;
-  // カードを引く順番
-  selectedTrumpValue: number | null;
-  // カラー
-  color: string;
-  // スキップを使ったか
-  usedSkip: boolean;
-};
+export const playerInputSchema = z.object({
+  name: z.string(),
+});
+export type PlayerInput = z.infer<typeof playerInputSchema>;
+
+export type Player = z.infer<typeof playerSchema>;

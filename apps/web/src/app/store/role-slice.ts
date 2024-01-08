@@ -20,7 +20,7 @@ const SQUARES = Array.from(
 );
 const i = SQUARES.length / DEFAULT_ROLES.length;
 // DEFAULT_ROLESをi回繰り返す
-const BOARD_ROLES = Array.from({ length: i }, (_, i) => DEFAULT_ROLES).flat();
+const BOARD_ROLES = Array.from({ length: i }, (_) => DEFAULT_ROLES).flat();
 // BOARD_ROLESを削ってでも3つskipRoleを入れる
 
 // 余った分をskipRoleで埋める
@@ -32,7 +32,7 @@ if (OPTION_ROLES_LENGTH < 3) {
 }
 const OPTION_ROLES_LIST = Array.from(
   { length: OPTION_ROLES_LENGTH },
-  (_, i) => skipRole,
+  (_) => skipRole,
 ).flat();
 const BOARD_ROLES_LIST = BOARD_ROLES.concat(OPTION_ROLES_LIST);
 
@@ -84,8 +84,15 @@ export const createRolesSlice: StateCreator<State, [], [], RolesSlice> = (
     const boardRoles = get().boardRoles.map((role) =>
       role.fixed ? randomRole : role,
     );
+    // 確定していない役職を削除する。表がややこしので。
+    const players = get().players.map((p) => {
+      if (!p.role) {
+        return p;
+      }
+      return unFixedRoles.indexOf(p.role) > -1 ? { ...p, role: null } : p;
+    });
     set((state) => {
-      return { ...state, boardRoles };
+      return { ...state, boardRoles, players };
     });
     return boardRoles;
   },

@@ -6,6 +6,7 @@ RUN apk add --no-cache curl && \
 # Set pnpm binary path
 ENV PNPM_HOME /usr/local/share/pnpm
 ENV PATH $PNPM_HOME:$PATH
+ENV export NEXT_SHARP_PATH=/app/node_modules/.pnpm/sharp@0.33.1/
 
 FROM base AS builder
 # Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
@@ -49,6 +50,12 @@ WORKDIR /app
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+###
+# 追記
+RUN pnpm add sharp
+# sharpをインストールしないと以下のエラーが出る
+# ⨯ Error: 'sharp' is required to be installed in standalone mode for the image optimization to function correctly. Read more at: https://nextjs.org/docs/messages/sharp-missing-in-production
+###
 USER nextjs
 
 COPY --from=installer /app/apps/web/next.config.js .
@@ -59,5 +66,6 @@ COPY --from=installer /app/apps/web/package.json .
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=installer --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
+
 
 CMD node apps/web/server.js

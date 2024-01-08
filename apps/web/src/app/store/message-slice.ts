@@ -1,17 +1,20 @@
 import { StateCreator } from "zustand";
-import { GameStateSlice, State } from "./slice-interfaces";
+import { MessageSlice, State } from "./slice-interfaces";
 
-export const createGameStateSlice: StateCreator<
+export const createMessageSlice: StateCreator<
   State, // すべてのデータの型
   [], // 利用するすべてのミドルウェアの配列
   [], // 配列
-  GameStateSlice
+  MessageSlice
 > = (set) => ({
   // ゲームの状態
-  gameState: "inputPhase",
+  message: {
+    texts: [""],
+    to: null,
+  },
   // ゲームの状態を変更する
-  setGameState: (gameState) =>
+  setMessage: (message) =>
     set((state) => {
-      return { ...state, gameState };
+      return { ...state, message };
     }),
 });

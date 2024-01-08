@@ -1,8 +1,15 @@
-export type Role = {
-  name: RoleType;
-  fixed: boolean;
-};
+import { z } from "zod";
 
-export type RoleType = MainRole | SkipRole;
-export type MainRole = "ファシリ" | "書記" | "1番目" | "2番目";
-export type SkipRole = "スキップ";
+export const roleSchema = z.object({
+  name: z.union([
+    z.literal("ファシリ"),
+    z.literal("書記"),
+    z.literal("1番目"),
+    z.literal("2番目"),
+    z.literal("スキップ"),
+  ]),
+  fixed: z.boolean(),
+});
+
+export type Role = z.infer<typeof roleSchema>;
+export type RoleType = z.infer<typeof roleSchema>["name"];

@@ -2,13 +2,13 @@
 import Image from "next/image";
 import React, { FC, useEffect } from "react";
 import { useBoundStore } from "../store";
-import { GameStateEnum, Trump } from "../types";
+import { Trump } from "../types";
 import clsx from "clsx";
 import { Box, Flex } from "@repo/ui";
 
 interface TrumpViewerProps {}
 
-export const TrumpViewer: FC<TrumpViewerProps> = ({}) => {
+export const TrumpViewer: FC<TrumpViewerProps> = () => {
   const { trumps, shuffleTrumps, gameState } = useBoundStore();
 
   useEffect(() => {
@@ -17,8 +17,7 @@ export const TrumpViewer: FC<TrumpViewerProps> = ({}) => {
 
   return (
     <Box>
-      {(gameState === GameStateEnum.orderPhase ||
-        gameState === GameStateEnum.sugorokuPhase) && (
+      {(gameState === "orderPhase" || gameState === "sugorokuPhase") && (
         <TrumpList trumpPropsList={trumps} />
       )}
     </Box>
@@ -32,7 +31,7 @@ interface TrumpListProps {
 const TrumpList: FC<TrumpListProps> = (props) => {
   const { trumpPropsList } = props;
   return (
-    <Flex gap="3" wrap="wrap">
+    <Flex gap="3" wrap="wrap" justify="end">
       {trumpPropsList.map((trumpProps) => (
         <TrumpCard key={trumpProps.value} {...trumpProps} />
       ))}

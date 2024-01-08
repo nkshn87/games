@@ -1,14 +1,19 @@
-import { GameStateEnumKeys, Player, Role, Trump } from "../types";
+import { GameState, Player, Role, Trump } from "../types";
+import { Message } from "../types/message";
 
 export interface PlayersSlice {
   players: Player[];
   isRoundComp: boolean;
   isLastPlayer: boolean;
-  currentPlayer: Player;
+  currentPlayer: Player | null;
+  colors: string[];
+  setCurrentPlayer: (player: Player) => void;
   // 現在のプレイヤーを次のプレイヤーに移す。一周したら最初のプレイヤーに戻り、Trueを返す
-  nextPlayer: () => void;
+  nextPlayer: () => Player | null;
   // プレイヤーを追加する
-  addPlayer: (player: Player) => void;
+  addPlayer: (name: Player["name"]) => void;
+  // プレイヤーを削除する
+  removePlayer: (name: Player["name"]) => void;
   // 特定のプレイヤーに特定の役職を仮で割り当てる
   assignRole: (player: Player, role: Role) => void;
   // 並び替え
@@ -70,9 +75,9 @@ export interface TrumpsSlice {
 
 export interface GameStateSlice {
   // ゲームの状態
-  gameState: GameStateEnumKeys;
+  gameState: GameState;
   // ゲームの状態を変更する
-  setGameState: (state: GameStateEnumKeys) => void;
+  setGameState: (state: GameState) => void;
 }
 
 export interface RolePlayerSlice {
@@ -82,4 +87,15 @@ export interface RolePlayerSlice {
   setRolePlayer: (player: Player) => void;
 }
 
-export type State = PlayersSlice & RolesSlice & TrumpsSlice & GameStateSlice;
+export interface MessageSlice {
+  // メッセージ
+  message: Message | null;
+  // メッセージを設定する
+  setMessage: (message: Message) => void;
+}
+
+export type State = PlayersSlice &
+  RolesSlice &
+  TrumpsSlice &
+  GameStateSlice &
+  MessageSlice;

@@ -1,4 +1,4 @@
-import { calculateInnerNumbers, calculateOuterNumbers } from "../utils";
+import { calculateOuterNumbers } from "../utils";
 
 describe("calculateOuterNumbers", () => {
   it("returns an empty array when size is less than 3", () => {
